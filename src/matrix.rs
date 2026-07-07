@@ -54,6 +54,11 @@ pub fn read_expr(path: &Path) -> Result<Expr> {
                 samples.len()
             )));
         }
+        if row.iter().any(|v| !v.is_finite()) {
+            return Err(RsomicsError::InvalidInput(format!(
+                "NA/NaN/Inf in input (gene '{gene}')"
+            )));
+        }
         genes.push(gene.to_string());
         y.push(row);
     }

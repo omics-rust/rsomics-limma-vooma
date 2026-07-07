@@ -90,6 +90,36 @@ fn golden_weights() {
     );
 }
 
+/// A non-finite literal in the log-expression matrix is malformed input:
+/// limma::vooma bails with "NA/NaN/Inf in 'y'". We reject it at parse with a
+/// loud error before any sort — no partial_cmp panic.
+fn assert_rejects_nonfinite(fixture: &str) {
+    let out = Command::new(ours())
+        .arg(golden(fixture))
+        .args(["--design", golden("design.tsv").to_str().unwrap()])
+        .output()
+        .unwrap();
+    assert!(
+        !out.status.success(),
+        "{fixture}: expected loud rejection, got success"
+    );
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        stderr.contains("NA/NaN/Inf in input"),
+        "{fixture}: stderr missing NA/NaN/Inf rejection: {stderr}"
+    );
+}
+
+#[test]
+fn rejects_nan_cell() {
+    assert_rejects_nonfinite("expr_nan.tsv");
+}
+
+#[test]
+fn rejects_inf_cell() {
+    assert_rejects_nonfinite("expr_inf.tsv");
+}
+
 /// Locate an Rscript that has limma installed. Prefers the project's r-bioc
 /// conda env (direct binary, no `conda run`), then falls back to PATH.
 fn rscript() -> Option<String> {
