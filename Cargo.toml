@@ -1,6 +1,6 @@
 [package]
 name = "rsomics-limma-vooma"
-version = "0.1.1"
+version = "0.1.2"
 description = "vooma mean-variance modelling: precision weights for a log-expression matrix + design — a clean-room Rust reimplementation of limma's vooma"
 edition = "2024"
 rust-version = "1.91"
